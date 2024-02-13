@@ -8,10 +8,12 @@ HOSTNAME=`env hostname`
 echo "Starting RabbitMQ Server For host: " $HOSTNAME
 
 if [ -z "$JOIN_CLUSTER_HOST" ]; then
-    /usr/local/bin/docker-entrypoint.sh rabbitmq-server &
-    sleep 5
+    /usr/local/bin/docker-entrypoint.sh rabbitmq-server -detached
+    sleep 20
+    rabbitmqctl set_policy ha-all "" '{"ha-mode":"all","ha-sync-mode":"automatic"}'
 else
     /usr/local/bin/docker-entrypoint.sh rabbitmq-server -detached
+    rm -rf /var/lib/rabbitmq/mnesia/
     sleep 5
     rabbitmqctl stop_app
     rabbitmqctl reset
